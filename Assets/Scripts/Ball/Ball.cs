@@ -12,6 +12,11 @@ public class Ball : MonoBehaviour
 
     public GameObject prefab;
 
+    public void InitSetting(float _height)
+    {
+        height = _height;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Player")
@@ -33,6 +38,9 @@ public class Ball : MonoBehaviour
                 for (int i = 0; i < 2; i++)
                 {
                     GameObject obj = Instantiate(prefab, new Vector3(transform.position.x + 2f * i, transform.position.y, transform.position.z), Quaternion.identity);
+                    Ball smallball = obj.GetComponent<Ball>();
+                    smallball.InitSetting((float)(height * 0.3));
+
                     Vector3 v = obj.transform.localScale;
 
                     v.x *= 0.5f;
@@ -40,6 +48,8 @@ public class Ball : MonoBehaviour
                     v.z *= 0.5f;
 
                     obj.transform.localScale = v;
+
+
                 }
             }
 
