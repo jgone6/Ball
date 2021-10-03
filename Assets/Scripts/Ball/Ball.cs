@@ -10,7 +10,11 @@ public class Ball : MonoBehaviour
 
     Player player;
 
-    public GameObject prefab;
+    public GameObject SmallBall;
+
+    //아이템 여러가지로 바꿔야됨
+    public GameObject Item;
+
 
     public void InitSetting(float _height)
     {
@@ -21,13 +25,16 @@ public class Ball : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            player = other.GetComponent<Player>();
+            player = other.GetComponentInParent<Player>();
 
-            player.On_Damage(10f);
+            player.On_Damage();
         }
         
         else if (other.tag == "Bullet")
         {
+            //확률에 따라 나오는 아이템 정해야됨
+            GameObject item = Instantiate(Item, new Vector3(transform.position.x, 0.5f, transform.position.z), Quaternion.identity);
+
             if (transform.localScale.x <= 0.3)
             {
                 Debug.Log("DestroyBall");
@@ -37,7 +44,7 @@ public class Ball : MonoBehaviour
             {
                 for (int i = 0; i < 2; i++)
                 {
-                    GameObject obj = Instantiate(prefab, new Vector3(transform.position.x + 2f * i, transform.position.y, transform.position.z), Quaternion.identity);
+                    GameObject obj = Instantiate(SmallBall, new Vector3(transform.position.x + 2f * i, transform.position.y, transform.position.z), Quaternion.identity);
                     Ball smallball = obj.GetComponent<Ball>();
                     smallball.InitSetting((float)(height * 0.3));
 

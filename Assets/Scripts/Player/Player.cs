@@ -2,10 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.UI;
+
+public enum BulletType
+{
+    basic = 0,
+    Double,
+
+}
 
 public class Player : MonoBehaviour
 {
-    private float playerhp = 300f;
+    [SerializeField]
+    private Image[] PlayerHp;
 
     [SerializeField]
     private float Speed = 10f;
@@ -18,7 +27,21 @@ public class Player : MonoBehaviour
 
     public GameObject bullet;
     public Transform bulletpos;
-    
+
+    private BulletType type = BulletType.basic;
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Item")
+        {
+            Item item = other.gameObject.GetComponent<Item>();
+
+            type = item.type;
+
+            Destroy(other.gameObject);
+        }
+    }
+
     private void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
@@ -49,9 +72,7 @@ public class Player : MonoBehaviour
        
         if (Input.GetMouseButtonDown(0))
         {
-            GameObject obj = Instantiate(bullet, bulletpos.position , Quaternion.identity);
-            Bullet b = obj.GetComponent<Bullet>();
-            b.initbullet(bulletpos.rotation);
+            Create_Bullet();
         }
 
         float mx = Input.GetAxis("Mouse X");
@@ -61,8 +82,42 @@ public class Player : MonoBehaviour
         transform.eulerAngles = new Vector3(0, ry, 0);
     }
 
-    public void On_Damage(float damage)
+    public void Create_Bullet()
     {
-        playerhp -= damage;
+        switch(type)
+        {
+            case BulletType.basic:
+                GameObject obj = Instantiate(bullet, bulletpos.position, Quaternion.identity);
+                Bullet b = obj.GetComponent<Bullet>();
+                b.initbullet(bulletpos.rotation);
+                break;
+
+            case BulletType.Double:
+                StartCoroutine(DBullet());
+                break;
+        }
+    }
+
+    IEnumerator DBullet()
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            GameObject obj = Instantiate(bullet, bulletpos.position, Quaternion.identity);
+            Bullet b = obj.GetComponent<Bullet>();
+            b.initbullet(bulletpos.rotation);
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
+    public void On_Damage()
+    {
+        for (int i = 0; i < PlayerHp.Length; i++)
+        {
+            if (PlayerHp[i].gameObject.activeSelf)
+            {
+                PlayerHp[i].gameObject.SetActive(false);
+                break;
+            }
+        }
     }
 }
