@@ -29,6 +29,14 @@ public class Player : MonoBehaviour
     public Transform bulletpos;
 
     private BulletType type = BulletType.basic;
+    private int deathcnt = 0;
+
+    public GameObject DeathUI;
+
+    private void Awake()
+    {
+        DeathUI.SetActive(false);
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -116,8 +124,15 @@ public class Player : MonoBehaviour
             if (PlayerHp[i].gameObject.activeSelf)
             {
                 PlayerHp[i].gameObject.SetActive(false);
+                deathcnt++;
                 break;
             }
+        }
+
+        if (deathcnt >= 3)
+        {
+            Time.timeScale = 0;
+            DeathUI.SetActive(true);
         }
     }
 }

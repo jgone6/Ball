@@ -15,10 +15,12 @@ public class Ball : MonoBehaviour
     //아이템 여러가지로 바꿔야됨
     public GameObject Item;
 
+    public int cnt = 0;
 
-    public void InitSetting(float _height)
+    public void InitSetting(float _height, int _cnt)
     {
         height = _height;
+        cnt = _cnt;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -32,10 +34,14 @@ public class Ball : MonoBehaviour
         
         else if (other.tag == "Bullet")
         {
-            //확률에 따라 나오는 아이템 정해야됨
-            GameObject item = Instantiate(Item, new Vector3(transform.position.x, 0.5f, transform.position.z), Quaternion.identity);
+            int ran = Random.Range(1, 100);
 
-            if (transform.localScale.x <= 0.3)
+            if (ran >= 50)
+            {
+                GameObject item = Instantiate(Item, new Vector3(transform.position.x, 0.5f, transform.position.z), Quaternion.identity);
+            }
+
+            if (cnt > 1)
             {
                 Debug.Log("DestroyBall");
             }
@@ -46,7 +52,7 @@ public class Ball : MonoBehaviour
                 {
                     GameObject obj = Instantiate(SmallBall, new Vector3(transform.position.x + 2f * i, transform.position.y, transform.position.z), Quaternion.identity);
                     Ball smallball = obj.GetComponent<Ball>();
-                    smallball.InitSetting((float)(height * 0.3));
+                    smallball.InitSetting((float)(height * 0.3), cnt + 1);
 
                     Vector3 v = obj.transform.localScale;
 
@@ -56,12 +62,13 @@ public class Ball : MonoBehaviour
 
                     obj.transform.localScale = v;
 
-
+                    BallManager.Instance.Ball_Create(obj);
                 }
             }
 
             Destroy(other.gameObject);
             Destroy(gameObject);
+            BallManager.Instance.Ball_Dealth(gameObject);
         }
     }
 
@@ -72,7 +79,6 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-
         ExcecuteReBounding(collision);
     }
 
